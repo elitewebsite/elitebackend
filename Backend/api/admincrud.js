@@ -1,13 +1,21 @@
 const mongoose = require("mongoose")
-//const connection = process.env.connection
 const express = require("express")
 const router = express.Router();
 
+//product scheamas
 const Category = require("../Models/Series")
 const Product = require("../Models/Product")
+const Light = require("../Models/Light")
+//middlewear to cheack user logged in or not
+const cheackUser = require("../Middlewears/cheackUser")
 
+const Verify = require("../Middlewears/verifyUser")
+
+//connection string
 const connection = "mongodb+srv://Muchmark:mLlrGljRs180tAAS@cluster0.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority"
 
+
+//connect to a mongodb
 mongoose.connect(connection).then((res) => {
 
 
@@ -15,40 +23,39 @@ mongoose.connect(connection).then((res) => {
     console.log(err)
 })
 
+
+//home page
 router.get("/", (req, res) => {
     res.status(200).json({
         message: "ok"
     })
 })
 
-// let categoryScheama = new mongoose.Schema({
-//     series: String,
-//     url: String,
-//     products: [{
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: 'product'
-//     }]
+//create main light category
+router.post("/createlight", cheackUser, (req, res) => {
+    const { name } = req.body
+    const light = new Light({ name })
+    light.save().then((val) => {
+        res.status(200).send(`light category created ${val}`)
+    }).catch((err) => {
+        res.status(400).send("category not created..")
+    })
+})
 
+router.get("/getlightcategory", (req, res) => {
 
+    Light.find().then((val) => {
+        res.status(200).send(val)
+    }).catch((err) => {
+        res.status(400).send("error in fetching..")
+    })
 
-// })
-
-// let productScheama = new mongoose.Schema({
-//     name: String,
-//     series: String,
-//     url: String,
-//     description: String,
-//     info: Array
-
-// })
-
-// const Category = mongoose.model("category", categoryScheama)
-// const Product = mongoose.model("product", productScheama)
+})
 
 
 
 //code to create new series
-router.post("/createseries", (req, res) => {
+router.post("/createseries", cheackUser, (req, res) => {
     const { series } = req.body;
 
     const response = new Category({
@@ -68,7 +75,7 @@ router.post("/createseries", (req, res) => {
 
 
 //code to update a series
-router.put('/update', (req, res) => {
+router.put('/update', cheackUser, (req, res) => {
     let user_id = '633cfb33f689dbd01f895639'
 
     Product.findByIdAndUpdate(user_id, { name: "bansuri", info },
@@ -83,8 +90,8 @@ router.put('/update', (req, res) => {
         });
 })
 
-//code to delet a perticular series from database
-router.delete('/delete', (req, res) => {
+//code to delet a perticular product from database
+router.delete('/delete', cheackUser, (req, res) => {
     let id = '633d07f6cb8583db7c84e878'
     let series = "music"
     Product.findByIdAndDelete(id, function (err, docs) {
@@ -108,7 +115,7 @@ router.delete('/delete', (req, res) => {
 })
 
 //add new product to series
-router.post("/addproduct", (req, res) => {
+router.post("/addproduct", cheackUser, (req, res) => {
     const { series, name, description, info } = req.body
     const product = new Product({
         name,
@@ -139,7 +146,7 @@ router.get("/getall", (req, res) => {
                 res.send(err)
             }
             else {
-                res.send(all)
+                res.json({ data:all })
             }
         })
 

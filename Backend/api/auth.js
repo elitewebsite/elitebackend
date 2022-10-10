@@ -1,53 +1,55 @@
 const express = require("express")
 const router = express.Router();
 const jwt = require("jsonwebtoken")
+const cheackUser = require("../Middlewears/cheackUser")
+const User = require("../Models/User")
+const Verify = require("../Middlewears/verifyUser")
 
+//private route user should be logged in to create user
+router.post("/newuser", cheackUser, (req, res) => {
 
-function cheackAuth(req, res, next) {
-    // console.log(req.body.token)
-    // console.log(req.body.token)
-    //const token = req.headers.authorization.split(' ')[1]
-    // console.log(token)
-    if (!req.body.token) {
-        res.status(404).send("token is must")
-    }
-    else {
-        try {
-            const decoded = jwt.verify(req.body.token, "secret@123")
-            // res.user = decoded.email
-            next()
-        }
-        catch {
-            res.send("error in authentication")
-        }
-    }
+    const { email, password } = req.body;
+    const user = new User({ email, password })
+    user.save().then((val) => {
+        res.status(200).json({ data: user })
 
+    }).catch((err) => {
 
-
-
-}
-router.get("/", (req, res) => {
-    res.send("hello wrold")
+        res.status(400).json({ msg: err })
+    })
 })
 
-router.get("/private", cheackAuth, (req, res) => {
-    res.send("welcome to private page..")
 
+//delte user
+router.post("/deleteuser", cheackUser, (req, res) => {
 
+    const { id } = req.body;
+    User.findByIdAndDelete(id, (err, doc) => {
+        if (err) {
+            res.status(400).json(err)
+        }
+        else {
+            res.status(200).json({ msg: "user deleted succesfully" })
+        }
+    })
 })
-// router.post("/login", (req, res) => {
-//     console.log(req.body)
 
-//     res.send("ok")
-// })
+//private route
+router.post("/private", cheackUser, (req, res) => {
 
-router.post("/login", (req, res) => {
-    const { email, password } = req.body
-    const token = jwt.sign({ email, password },
+    res.status(200).json({ message: `helloo ${req.user}` })
+})
+
+
+//login route 
+router.post("/login", Verify, (req, res) => {
+
+    const data = req.body.data
+    const token = jwt.sign({ email: data.email, password: data.password },
         "secret@123",
-        { expiresIn: "30s" }
+        { expiresIn: "20s" }
     )
-    res.send(token)
+    res.json({ token: token })
 
 })
 

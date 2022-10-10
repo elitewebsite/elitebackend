@@ -301,3 +301,37 @@
 //     });
 
 // });
+
+// function cheackUser(req, res, next) {
+
+//     try {
+//         if (!req.cookies.jwt) {
+//             res.status(404).send("token is must")
+//         }
+//         else {
+//             try {
+//                 const decoded = jwt.verify(req.cookies.jwt, "secret@123")
+//                 req.user = decoded.email
+//                 console.log(req.cookies.jwt)
+//                 next()
+//             }
+//             catch {
+//                 res.status(404).send("error in authentication jwt expired.")
+//             }
+//         }
+//     }
+//     catch {
+//         res.status(404).send("error coockie not found")
+
+//     }
+// }
+
+
+//logout route 
+
+// router.get("/logout", cheackUser, (req, res) => {
+//     console.log(req.cookies.jwt)
+//     res.clearCookie("jwt")
+//     req.user = undefined;
+//     res.send("logout succsfully..")
+// })

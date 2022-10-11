@@ -10,7 +10,8 @@ const Light = require("../Models/Light")
 const cheackUser = require("../Middlewears/cheackUser")
 
 const Verify = require("../Middlewears/verifyUser")
-
+const cloudinaryImageUploadMethod = require("../Functions/uploader")
+const deletFolder = require("../Functions/delter")
 //connection string
 const connection = "mongodb+srv://Muchmark:mLlrGljRs180tAAS@cluster0.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority"
 
@@ -32,9 +33,22 @@ router.get("/", (req, res) => {
 })
 
 //create main light category
-router.post("/createlight", cheackUser, (req, res) => {
-    const { name } = req.body
-    const light = new Light({ name })
+router.post("/createlight", async (req, res) => {
+    // const { name } = req.body
+    // console.log(req.body.myfile)
+    //const file=req.files.myfile
+    
+    const { name } = req.body;
+    const url = await cloudinaryImageUploadMethod(req.files.myfile)
+    //console.log(req.body)
+    // console.log(req.files.myfile)
+
+
+
+   // console.log(req.headers['authorization'])
+    // res.json({ status: "ok" })
+
+    const light = new Light({ name, url })
     light.save().then((val) => {
         res.status(200).send(`light category created ${val}`)
     }).catch((err) => {
@@ -42,6 +56,9 @@ router.post("/createlight", cheackUser, (req, res) => {
     })
 })
 
+
+
+//get all categories from main light
 router.get("/getlightcategory", (req, res) => {
 
     Light.find().then((val) => {
@@ -68,17 +85,33 @@ router.post("/createseries", cheackUser, (req, res) => {
     }).catch((err) => {
         res.send(err)
     })
+})
 
+//update series name or url
+router.put("/updateseries", cheackUser, (req, res) => {
+    //const { id, name } = req.body
+    let id = "63395a94d33fac1f889eedf0"
+    const series = "mobile accesseries"
+    Category.findByIdAndUpdate(id, { series }, function (err, docs) {
+        if (err) {
+            res.send(err)
+        }
+        else {
+            res.send("doc updated succesfullyy.....")
+            //console.log("Updated User : ", docs);
+        }
+    });
 
 
 })
 
 
-//code to update a series
-router.put('/update', cheackUser, (req, res) => {
+//code to update a product from series
+router.put('/updateproduct', cheackUser, (req, res) => {
     let user_id = '633cfb33f689dbd01f895639'
 
-    Product.findByIdAndUpdate(user_id, { name: "bansuri", info },
+
+    Product.findByIdAndUpdate(user_id, { name: "bansuriya" },
         function (err, docs) {
             if (err) {
                 res.send(err)
@@ -146,7 +179,7 @@ router.get("/getall", (req, res) => {
                 res.send(err)
             }
             else {
-                res.json({ data:all })
+                res.json(all)
             }
         })
 

@@ -1,49 +1,16 @@
 const express = require("express")
 const router = express.Router();
 const Homedynamic = require("../Models/Homedynamic")
-var cloudinary = require('cloudinary').v2;
-const fs = require("fs");
+
 const cheackUser = require("../Middlewears/cheackUser")
-
-
-
-
-//cloudinary configuration..
-cloudinary.config({
-    cloud_name: process.env.cloud_name,
-    api_key: process.env.api_key,
-    api_secret: process.env.api_key,
-    secure: true
-});
-
-
-
-
-//upload images to cloudinary
-const cloudinaryImageUploadMethod = async file => {
-    return new Promise(resolve => {
-        cloudinary.uploader.upload(file.tempFilePath, (err, res) => {
-            if (err) return res.status(500).send("upload image error")
-            resolve(
-                res.url
-            )
-        }
-        )
-    })
-}
-
-
+const cloudinaryImageUploadMethod = require("../Functions/uploader")
+const deletFolder = require("../Functions/delter")
 //delete the temporary folder which stores the images buffer
-const deletFolder = async () => {
-    return new Promise((resolve) => {
-        fs.rmSync("./tmp", { recursive: true, force: true })
-        resolve();
-    })
-}
+
 
 
 //update the hom epage content
-router.post("/updatedynamic",cheackUser,async (req, res) => {
+router.post("/updatedynamic", cheackUser, async (req, res) => {
     //get images from database
     const carousel1 = req.files.file1;
     const carousel2 = req.files.file2;
@@ -87,7 +54,7 @@ router.post("/updatedynamic",cheackUser,async (req, res) => {
 
 })
 
-router.get("/getdynamic",(req, res) => {
+router.get("/getdynamic", (req, res) => {
     Homedynamic.find().then((val) => {
         res.status(200).send(val[0])
 

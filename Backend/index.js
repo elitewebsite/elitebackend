@@ -15,7 +15,7 @@ app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
 app.use(express.json())
-app.use(cors())
+app.use(cors({ origin: "*", }))
 // for parsing application/json
 app.use(bodyParser.json());
 const fileupload = require("express-fileupload")

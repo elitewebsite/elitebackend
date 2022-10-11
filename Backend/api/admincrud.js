@@ -47,8 +47,10 @@ router.post("/createlight", async (req, res) => {
     // res.json({ status: "ok" })
 
     const light = new Light({ name, url })
-    light.save().then((val) => {
-        res.status(200).send(`light category created ${val}`)
+    light.save().then(async (val) => {
+        await deletFolder();
+        res.status(200).send(`light category created ${val}`);
+        
     }).catch((err) => {
         res.status(400).send("category not created..")
     })

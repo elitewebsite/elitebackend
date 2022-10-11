@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken")
 
 //track the user with jwt token
 function cheackUser(req, res, next) {
-    const token = req.headers['x-access-token']
+    const token = req.headers['authorization'];
+
 
     if (token) {
         try {

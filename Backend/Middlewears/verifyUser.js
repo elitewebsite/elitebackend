@@ -1,8 +1,8 @@
 const User = require("../Models/User")
 
 function verifyUser(req, res, next) {
-    const data = req.body.data;
-    const { email, password } = data;
+    //const data = req.body.data;
+    const { email, password } = req.body;
     User.findOne({ email, password }).then((val) => {
         req.user = val.email
         next();

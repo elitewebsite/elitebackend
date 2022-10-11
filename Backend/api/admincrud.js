@@ -37,15 +37,13 @@ router.post("/createlight", async (req, res) => {
     // const { name } = req.body
     // console.log(req.body.myfile)
     //const file=req.files.myfile
-    
+
     const { name } = req.body;
     const url = await cloudinaryImageUploadMethod(req.files.myfile)
     //console.log(req.body)
     // console.log(req.files.myfile)
 
-
-
-   // console.log(req.headers['authorization'])
+    // console.log(req.headers['authorization'])
     // res.json({ status: "ok" })
 
     const light = new Light({ name, url })

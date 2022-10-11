@@ -44,12 +44,13 @@ router.post("/private", cheackUser, (req, res) => {
 //login route 
 router.post("/login", Verify, (req, res) => {
 
-    const data = req.body.data
-    const token = jwt.sign({ email: data.email, password: data.password },
+   const { email, password } = req.body
+    const token = jwt.sign({ email, password },
         "secret@123",
         { expiresIn: "20s" }
     )
     res.json({ token: token })
+    
 
 })
 

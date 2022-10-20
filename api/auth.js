@@ -6,39 +6,42 @@ const User = require("../Models/User")
 const Verify = require("../Middlewears/verifyUser")
 
 //private route user should be logged in to create user
-router.post("/newuser", Verify, async (req, res) => {
-
+router.post("/newuser", cheackUser, async (req, res) => {
     const { email, password } = req.body;
-
     const user = await User.find({ email })
-    res.send(user)
+
     if (user.email) {
         res.status(400).send("user alreday exist")
     }
+
     else {
         const user = new User({ email, password })
         user.save().then((val) => {
-            res.status(200).json({ data: user })
-
+            res.status(200).send("New User created successfully")
         }).catch((err) => {
-
-            res.status(400).json({ msg: err })
+            res.status(400).send("User not created")
         })
     }
-
 })
 
+// Get all users
+router.get("/getalluser", cheackUser, (req, res) => {
+    User.find().then((val) => {
+        res.status(200).send(val)
+    }).catch((err) => {
+        res.status(400).send(err)
+    })
+})
 
 //delte user
 router.post("/deleteuser", cheackUser, (req, res) => {
-
     const { id } = req.body;
     User.findByIdAndDelete(id, (err, doc) => {
         if (err) {
-            res.status(400).json(err)
+            res.status(400).send(err)
         }
         else {
-            res.status(200).json({ msg: "user deleted succesfully" })
+            res.status(200).send('User Deleted Successfully..')
         }
     })
 })
@@ -49,19 +52,15 @@ router.post("/private", cheackUser, (req, res) => {
     res.status(200).json({ message: `helloo ${req.user}` })
 })
 
-
 //login route 
 router.post("/login", Verify, (req, res) => {
 
     const { email, password } = req.body
     const token = jwt.sign({ email, password },
         "secret@123",
-        { expiresIn: "20s" }
+        { expiresIn: "1h" }
     )
     res.json({ token: token })
-
-
 })
 
 module.exports = router;
-

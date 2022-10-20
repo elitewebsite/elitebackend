@@ -7,10 +7,8 @@ const cloudinaryImageUploadMethod = require("../Functions/uploader")
 const deletFolder = require("../Functions/delter")
 //delete the temporary folder which stores the images buffer
 
-
-
 //update the hom epage content
-router.post("/updatedynamic", cheackUser, async (req, res) => {
+router.post("/updatehomepage", cheackUser, async (req, res) => {
     //get images from database
     const carousel1 = req.files.file1;
     const carousel2 = req.files.file2;
@@ -20,12 +18,10 @@ router.post("/updatedynamic", cheackUser, async (req, res) => {
     //create aboject to store  in database
     const info = {
         carousel: [{
-
             "title": req.body.carousel1title,
             "url": await cloudinaryImageUploadMethod(carousel1)
         },
         {
-
             "title": req.body.carousel2title,
             "url": await cloudinaryImageUploadMethod(carousel2)
         }],
@@ -49,19 +45,16 @@ router.post("/updatedynamic", cheackUser, async (req, res) => {
         await deletFolder()
         res.status(200).send("doc updated succesfully..")
     }).catch((err) => {
-        res.send(err)
+        res.status(400).send(err)
     })
-
 })
 
+// View Home page publically on website
 router.get("/getdynamic", (req, res) => {
     Homedynamic.find().then((val) => {
         res.status(200).send(val[0])
-
     }).catch((err) => {
-
-        res.send(err)
+        res.status(400).send(err)
     })
 })
-
 module.exports = router;

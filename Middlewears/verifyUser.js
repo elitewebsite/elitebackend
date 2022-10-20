@@ -7,7 +7,7 @@ function verifyUser(req, res, next) {
         req.user = val.email
         next();
     }).catch((err) => {
-        res.status(404).json({ msg: "user not found" })
+        res.status(401).send("User Not Found")
     })
 }
 

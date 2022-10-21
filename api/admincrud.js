@@ -80,7 +80,7 @@ router.post('/updatelight', cheackUser, async (req, res) => {
 
 
 //get all categories from main light
-router.get("/getlightcategory", cheackUser, (req, res) => {
+router.get("/getlightcategory",(req, res) => {
 
     Light.find().then((val) => {
         res.status(200).send(val)

@@ -8,15 +8,13 @@ const homedynamic = require("./api/homedynamic")
 const cors = require("cors")
 const dotenv = require('dotenv')
 const port = process.env.PORT || 3032;
-
-//const fs=require("fs")
 dotenv.config()
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
 app.use(express.json())
 app.use(cors({ origin: "*", }))
-// for parsing application/json
+
 app.use(bodyParser.json());
 const fileupload = require("express-fileupload")
 
@@ -25,15 +23,12 @@ app.use(fileupload({
 
 }))
 
-//const file = require("./tmp")
-// for parsing application/xwww-
+
 app.use(bodyParser.urlencoded({ extended: true }));
-//form-urlencoded
-//use midddlewears routes
+
 
 app.use('/auth', auth)
 app.use('/admincrud', admincrud)
 app.use('/homedynamic', homedynamic)
-//fs.rmSync("./temp", { recursive: true, force: true })
 //app listening
 app.listen(port, () => { console.log(`app is successfully listening on ${port}}`) })

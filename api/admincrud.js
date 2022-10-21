@@ -6,6 +6,7 @@ const router = express.Router();
 const Category = require("../Models/Series")
 const Product = require("../Models/Product")
 const Light = require("../Models/Light")
+require('dotenv').config();
 
 //middlewear to cheack user logged in or not
 const cheackUser = require("../Middlewears/cheackUser")
@@ -16,8 +17,7 @@ const deletFolder = require("../Functions/delter")
 
 //connection string
 var cloudinary = require('cloudinary').v2;
-
-const connection = "mongodb+srv://Muchmark:mLlrGljRs180tAAS@cluster0.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority"
+const connection = `mongodb+srv://Muchmark:${process.env.mongodb_password}.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority`
 
 //connect to a mongodb
 mongoose.connect(connection).then((res) => {
@@ -37,18 +37,21 @@ router.post("/createlight", cheackUser, async (req, res) => {
     let url;
     try {
         url = await cloudinaryImageUploadMethod(file)
+        const light = new Light({ name, url })
+        light.save().then(async (val) => {
+            await deletFolder();
+            res.status(200).send(`Light category created`);
+
+        }).catch(async (err) => {
+            await deletFolder();
+            res.status(400).send("Category not created..")
+        })
     }
     catch (err) {
+
         res.status(400).send(err)
     }
-    const light = new Light({ name, url })
-    light.save().then(async (val) => {
-        await deletFolder();
-        res.status(200).send(`Light category created`);
 
-    }).catch((err) => {
-        res.status(400).send("Category not created..")
-    })
 })
 
 //update main light category
@@ -152,7 +155,7 @@ router.get("/getallseries", cheackUser, (req, res) => {
 })
 
 //Get all series names only
-router.get("/getseriesname",cheackUser, (req, res) => {
+router.get("/getseriesname", cheackUser, (req, res) => {
 
     Category.find({}, { series: 1, _id: 0 }).then((val) => {
         res.status(200).send(val)
@@ -265,7 +268,7 @@ router.post("/addproduct", cheackUser, async (req, res) => {
 
 
 //Update:code to update a product from series
-router.post('/updateproduct',cheackUser, async (req, res) => {
+router.post('/updateproduct', cheackUser, async (req, res) => {
     //get data from body...
     const { id,
         series_name,
@@ -349,7 +352,7 @@ router.post('/deleteproduct', cheackUser, (req, res) => {
 
 //Read :get single product from collection to to update
 
-router.post('/getproductbyid',cheackUser, (req, res) => {
+router.post('/getproductbyid', cheackUser, (req, res) => {
     const { id } = req.body
     Product.findById(id).then((val) => {
         res.status(200).send(val)
@@ -360,7 +363,7 @@ router.post('/getproductbyid',cheackUser, (req, res) => {
 
 
 //Read :get product details for product table
-router.get("/getallproducts",cheackUser, (req, res) => {
+router.get("/getallproducts", cheackUser, (req, res) => {
     Product.find({}, { pdflink: 0, news: 0, youtube: 0, product_description: 0 }).sort([["series", 1]]).then((data) => {
         res.status(200).send(data)
     }).catch((err) => {

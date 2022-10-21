@@ -36,4 +36,4 @@ app.use('/admincrud', admincrud)
 app.use('/homedynamic', homedynamic)
 //fs.rmSync("./temp", { recursive: true, force: true })
 //app listening
-app.listen(port, () => { console.log(`app is successfully lisstening on ${port}}`) })
+app.listen(port, () => { console.log(`app is successfully listening on ${port}}`) })

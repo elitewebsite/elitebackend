@@ -31,4 +31,4 @@ app.use('/auth', auth)
 app.use('/admincrud', admincrud)
 app.use('/homedynamic', homedynamic)
 //app listening
-app.listen(port, () => { console.log(`app is successfully listening on ${port}}`) })
+app.listen(port)

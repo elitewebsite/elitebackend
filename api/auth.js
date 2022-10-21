@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 const cheackUser = require("../Middlewears/cheackUser")
 const User = require("../Models/User")
 const Verify = require("../Middlewears/verifyUser")
-
+require('dotenv').config()
 //private route user should be logged in to create user
 router.post("/newuser", cheackUser, async (req, res) => {
     const { email, password } = req.body;
@@ -57,7 +57,7 @@ router.post("/login", Verify, (req, res) => {
 
     const { email, password } = req.body
     const token = jwt.sign({ email, password },
-        "secret@123",
+        process.env.secure_key,
         { expiresIn: "1h" }
     )
     res.json({ token: token })

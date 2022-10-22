@@ -80,7 +80,7 @@ router.post('/updatelight', cheackUser, async (req, res) => {
 
 
 //get all categories from main light
-router.get("/getlightcategory",(req, res) => {
+router.get("/getlightcategory", (req, res) => {
 
     Light.find().then((val) => {
         res.status(200).send(val)
@@ -373,7 +373,8 @@ router.get("/getallproducts", cheackUser, (req, res) => {
 
 //Read :Get all poducts populated by series by default public only for website
 router.get("/getall", (req, res) => {
-    Category.find()
+    const mainlight = req.query.mainlight
+    Category.find({ mainlight })
         .populate('products').exec((err, all) => {
             if (err) {
                 res.send(err)

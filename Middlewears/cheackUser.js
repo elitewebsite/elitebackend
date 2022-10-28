@@ -10,7 +10,6 @@ function cheackUser(req, res, next) {
             next()
         }
         catch {
-
             res.status(401).send("Invalid Credentials")
         }
     }
@@ -18,6 +17,5 @@ function cheackUser(req, res, next) {
 
         res.status(401).send('Invalid Credentials')
     }
-
 }
 module.exports = cheackUser

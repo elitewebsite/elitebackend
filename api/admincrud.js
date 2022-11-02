@@ -35,22 +35,23 @@ router.post("/createlight", cheackUser, async (req, res) => {
     const file = req.files.myfile
     const { name } = req.body;
     let url;
-    try {
-        url = await cloudinaryImageUploadMethod(file)
-        const light = new Light({ name, url })
-        light.save().then(async (val) => {
-           
-            res.status(200).send(`Light category created`);
+    res.send("image not uploaded..")
+    // try {
+    //     url = await cloudinaryImageUploadMethod(file)
+    //     const light = new Light({ name, url })
+    //     light.save().then(async (val) => {
 
-        }).catch(async (err) => {
-          
-            res.status(400).send("Category not created..")
-        })
-    }
-    catch (err) {
+    //         res.status(200).send(`Light category created`);
 
-        res.status(400).send(err)
-    }
+    //     }).catch(async (err) => {
+
+    //         res.status(400).send("Category not created..")
+    //     })
+    // }
+    // catch (err) {
+
+    //     res.status(400).send(err)
+    // }
 
 })
 

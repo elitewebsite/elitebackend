@@ -39,11 +39,11 @@ router.post("/createlight", cheackUser, async (req, res) => {
         url = await cloudinaryImageUploadMethod(file)
         const light = new Light({ name, url })
         light.save().then(async (val) => {
-            await deletFolder();
+           
             res.status(200).send(`Light category created`);
 
         }).catch(async (err) => {
-            await deletFolder();
+          
             res.status(400).send("Category not created..")
         })
     }

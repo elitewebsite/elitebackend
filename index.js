@@ -13,19 +13,16 @@ dotenv.config()
 app.use(express.json())
 app.use(cors())
 app.use(cookieParser())
-app.use(express.json())
 
 app.use(bodyParser.json());
 const fileupload = require("express-fileupload")
 
 app.use(fileupload({
     useTempFiles: true,
-
 }))
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 app.use('/auth', auth)
 app.use('/admincrud', admincrud)

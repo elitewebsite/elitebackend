@@ -30,28 +30,31 @@ mongoose.connect(connection).then((res) => {
 
 // ************************* Main Light Category Section ***********************
 //create main light category
-router.post("/createlight", cheackUser, async (req, res) => {
+router.post("/createlight", async (req, res) => {
 
-    const file = req.files.myfile
-    const { name } = req.body;
-    let url;
-    res.send("image not uploaded..")
-    // try {
-    //     url = await cloudinaryImageUploadMethod(file)
-    //     const light = new Light({ name, url })
-    //     light.save().then(async (val) => {
+    // const file = req.files.myfile
+   // console.log(file)
+    const { name, myfile } = req.body;
+    // const url = await cloudinary.uploader.upload(req.body.myfile)
+    //res.send(url)
+    // let url;
+    // res.send("image not uploaded..")
+    try {
+        const url = await cloudinary.uploader.upload(myfile)
+        const light = new Light({ name, url })
+        light.save().then(async (val) => {
 
-    //         res.status(200).send(`Light category created`);
+            res.status(200).send(`Light category created`);
 
-    //     }).catch(async (err) => {
+        }).catch(async (err) => {
 
-    //         res.status(400).send("Category not created..")
-    //     })
-    // }
-    // catch (err) {
+            res.status(400).send("Category not created..")
+        })
+    }
+    catch (err) {
 
-    //     res.status(400).send(err)
-    // }
+        res.status(400).send(err)
+    }
 
 })
 

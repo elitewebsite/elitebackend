@@ -18,7 +18,12 @@ const deletFolder = require("../Functions/delter")
 //connection string
 var cloudinary = require('cloudinary').v2;
 const connection = `mongodb+srv://Muchmark:${process.env.mongodb_password}.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority`
-
+cloudinary.config({
+    cloud_name: "dibwyka4z",
+    api_key: "976358469583163",
+    api_secret: "kLaYxxHEXKyevL-MZNbgwDrE7-o",
+    secure: true
+});
 //connect to a mongodb
 mongoose.connect(connection).then((res) => {
 
@@ -31,11 +36,14 @@ mongoose.connect(connection).then((res) => {
 // ************************* Main Light Category Section ***********************
 //create main light category
 router.post("/createlight", async (req, res) => {
-
-    // const file = req.files.myfile
-   // console.log(file)
-    const { name, myfile } = req.body;
-    // const url = await cloudinary.uploader.upload(req.body.myfile)
+const { name, myfile } = req.body;
+//  try {
+//         const url = await cloudinary.uploader.upload(myfile)
+//         res.status(200).send(url)
+//     }
+//     catch (e) {
+//         res.status(400).send(e)
+//     }
     //res.send(url)
     // let url;
     // res.send("image not uploaded..")

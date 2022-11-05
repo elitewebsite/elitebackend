@@ -1,52 +1,58 @@
 const express = require("express")
 const router = express.Router();
 const Homedynamic = require("../Models/Homedynamic")
-
 const cheackUser = require("../Middlewears/cheackUser")
-const cloudinaryImageUploadMethod = require("../Functions/uploader")
-const deletFolder = require("../Functions/delter")
 //delete the temporary folder which stores the images buffer
-
+var cloudinary = require('cloudinary').v2;
+cloudinary.config({
+    cloud_name: "dibwyka4z",
+    api_key: "976358469583163",
+    api_secret: "kLaYxxHEXKyevL-MZNbgwDrE7-o",
+    secure: true
+});
 //update the hom epage content
 router.post("/updatehomepage", cheackUser, async (req, res) => {
-    //get images from database
-    const carousel1 = req.files.file1;
-    const carousel2 = req.files.file2;
-    const about1 = req.files.file3;
-    const about2 = req.files.file4;
-
     //create aboject to store  in database
-    const info = {
-        carousel: [{
-            "title": req.body.carousel1title,
-            "url": await cloudinaryImageUploadMethod(carousel1)
-        },
-        {
-            "title": req.body.carousel2title,
-            "url": await cloudinaryImageUploadMethod(carousel2)
-        }],
+    file1 = await cloudinary.uploader.upload(req.body.file1)
+    file2 = await cloudinary.uploader.upload(req.body.file2)
+    file3 = await cloudinary.uploader.upload(req.body.file3)
+    file4 = await cloudinary.uploader.upload(req.body.file4)
 
-        about: [
-            {
-                img: await cloudinaryImageUploadMethod(about1),
-                title: req.body.about1title,
-                content: req.body.about1desc
-
+    try {
+        const info = {
+            carousel: [{
+                "title": req.body.carousel1title,
+                "url": file1.url
             },
             {
-                img: await cloudinaryImageUploadMethod(about2),
-                title: req.body.about2title,
-                content: req.body.about2desc
-            }
-        ]
+                "title": req.body.carousel2title,
+                "url": file2.url
+            }],
+
+            about: [
+                {
+                    img: file3.url,
+                    title: req.body.about1title,
+                    content: req.body.about1desc
+
+                },
+                {
+                    img: file4.url,
+                    title: req.body.about2title,
+                    content: req.body.about2desc
+                }
+            ]
+        }
+        Homedynamic.findByIdAndUpdate("633eb9fa6f9a4fc7ec957b87", { carousel: info.carousel, about: info.about }).then(async (respo) => {
+            res.status(200).send("doc updated succesfully..")
+        }).catch((err) => {
+            res.status(400).send(err)
+        })
+    }
+    catch (e) {
+        res.status(400).send(err)
     }
 
-    Homedynamic.findByIdAndUpdate("633eb9fa6f9a4fc7ec957b87", { carousel: info.carousel, about: info.about }).then(async (res) => {
-        await deletFolder()
-        res.status(200).send("doc updated succesfully..")
-    }).catch((err) => {
-        res.status(400).send(err)
-    })
 })
 
 // View Home page publically on website

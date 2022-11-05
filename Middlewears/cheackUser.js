@@ -3,6 +3,7 @@ require('dotenv').config()
 //track the user with jwt token
 function cheackUser(req, res, next) {
     const token = req.headers['authorization'];
+   
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.secure_key)

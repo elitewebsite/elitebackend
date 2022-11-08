@@ -43,7 +43,7 @@ router.post("/updatehomepage", cheackUser, async (req, res) => {
                 }
             ]
         }
-        Homedynamic.findByIdAndUpdate("633eb9fa6f9a4fc7ec957b87", { carousel: info.carousel, about: info.about }).then(async (respo) => {
+        Homedynamic.findByIdAndUpdate("636a3d719f2b55693070f6ec", { carousel: info.carousel, about: info.about }).then(async (respo) => {
             res.status(200).send("doc updated succesfully..")
         }).catch((err) => {
             res.status(400).send(err)
@@ -62,5 +62,40 @@ router.get("/getdynamic", (req, res) => {
     }).catch((err) => {
         res.status(400).send(err)
     })
+})
+
+
+router.get("/addhomedynamic", (req, res) => {
+    const info = {
+        carousel: [{
+            "title": "",
+            "url": ""
+        },
+        {
+            "title": "",
+            "url": ""
+        }],
+
+        about: [
+            {
+                img: "",
+                title: "",
+                content: ""
+
+            },
+            {
+                img: "",
+                title: "",
+                content: ""
+            }
+        ]
+    }
+    const homedynamic = new Homedynamic({ carousel: info.carousel, about: info.about });
+    homedynamic.save().then(() => {
+        res.status(200).send("status is ok")
+    }).catch((err) => {
+        res.status(400).send("error in addtion")
+    })
+
 })
 module.exports = router;

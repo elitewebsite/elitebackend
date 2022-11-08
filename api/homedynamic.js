@@ -5,9 +5,9 @@ const cheackUser = require("../Middlewears/cheackUser")
 //delete the temporary folder which stores the images buffer
 var cloudinary = require('cloudinary').v2;
 cloudinary.config({
-    cloud_name: "dibwyka4z",
-    api_key: "976358469583163",
-    api_secret: "kLaYxxHEXKyevL-MZNbgwDrE7-o",
+    cloud_name: process.env.cloud_name,
+    api_key: process.env.api_key,
+    api_secret: process.env.api_secret,
     secure: true
 });
 //update the hom epage content

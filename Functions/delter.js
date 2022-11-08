@@ -6,5 +6,4 @@ const deletFolder = async () => {
         resolve();
     })
 }
-
 module.exports=deletFolder;

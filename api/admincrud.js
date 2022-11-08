@@ -12,26 +12,27 @@ require('dotenv').config();
 const cheackUser = require("../Middlewears/cheackUser")
 
 //connection string
+const connection = `mongodb+srv://newelitedynamicwebsite:${process.env.mongodb_password}@cluster0.1ee4by5.mongodb.net/Elite?retryWrites=true&w=majority`
+
+//cloudinary setup
 var cloudinary = require('cloudinary').v2;
-const connection = `mongodb+srv://Muchmark:${process.env.mongodb_password}.irij3nk.mongodb.net/Elite?retryWrites=true&w=majority`
 cloudinary.config({
-    cloud_name: "dibwyka4z",
-    api_key: "976358469583163",
-    api_secret: "kLaYxxHEXKyevL-MZNbgwDrE7-o",
+    cloud_name: process.env.cloud_name,
+    api_key: process.env.api_key,
+    api_secret: process.env.api_secret,
     secure: true
 });
+
 //connect to a mongodb
 mongoose.connect(connection).then((res) => {
-
 }).catch((err) => {
     console.log(err)
 })
 
 
-
 // ************************* Main Light Category Section ***********************
 //create main light category
-router.post("/createlight",cheackUser, async (req, res) => {
+router.post("/createlight", cheackUser, async (req, res) => {
     const { name, myfile } = req.body;
     try {
         const response = await cloudinary.uploader.upload(myfile)
@@ -48,7 +49,7 @@ router.post("/createlight",cheackUser, async (req, res) => {
 })
 
 //update main light category
-router.post('/updatelight',cheackUser, async (req, res) => {
+router.post('/updatelight', cheackUser, async (req, res) => {
     const { id, name, myfile } = req.body;
     try {
         const response = await cloudinary.uploader.upload(myfile)
@@ -69,7 +70,6 @@ router.post('/updatelight',cheackUser, async (req, res) => {
 
 //get all categories from main light
 router.get("/getlightcategory", (req, res) => {
-
     Light.find().then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
@@ -78,7 +78,7 @@ router.get("/getlightcategory", (req, res) => {
 })
 
 //get light category find by id
-router.post("/getlightcategoryid",cheackUser, (req, res) => {
+router.post("/getlightcategoryid", cheackUser, (req, res) => {
     const { id } = req.body;
     Light.findById(id).then((val) => {
         res.status(200).send(val)
@@ -104,8 +104,9 @@ router.post('/deletemainlight', cheackUser, (req, res) => {
 
 
 // ********************************* Series Section  *******************************
+
 //code to create new series
-router.post("/createseries", async (req, res) => {
+router.post("/createseries", cheackUser, async (req, res) => {
     const { mainlight, series, myfile } = req.body;
     try {
         const responseCloud = await cloudinary.uploader.upload(myfile)
@@ -128,7 +129,7 @@ router.post("/createseries", async (req, res) => {
 })
 
 //Read :get light categories by id it will give single result
-router.post("/getseriesbyid", (req, res) => {
+router.post("/getseriesbyid", cheackUser, (req, res) => {
     const { id } = req.body;
     Category.findById(id, { products: 0 }).then((val) => {
         res.status(200).send(val)
@@ -138,7 +139,7 @@ router.post("/getseriesbyid", (req, res) => {
 })
 
 //Read  all series with all data
-router.get("/getallseries", (req, res) => {
+router.get("/getallseries", cheackUser, (req, res) => {
     Category.find().then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
@@ -147,7 +148,7 @@ router.get("/getallseries", (req, res) => {
 })
 
 //Get all series names only
-router.get("/getseriesname", (req, res) => {
+router.get("/getseriesname", cheackUser, (req, res) => {
     Category.find({}, { series: 1, _id: 0 }).then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
@@ -156,7 +157,7 @@ router.get("/getseriesname", (req, res) => {
 })
 
 //update series name, image url and main light category name
-router.post("/updateseries", async (req, res) => {
+router.post("/updateseries", cheackUser, async (req, res) => {
     const { id, series, mainlight, myfile } = req.body
     try {
         const responseCloud = await cloudinary.uploader.upload(myfile)
@@ -175,7 +176,7 @@ router.post("/updateseries", async (req, res) => {
 })
 
 //Delete delete a perticular series
-router.post("/deleteseries", (req, res) => {
+router.post("/deleteseries", cheackUser, (req, res) => {
     const { id, series } = req.body;
     Category.findByIdAndDelete(id, function (err, docs) {
         if (err) {
@@ -200,7 +201,7 @@ router.post("/deleteseries", (req, res) => {
 // ********************** Product Section *************************
 
 //Create:add new product to series with all related details
-router.post("/addproduct", async (req, res) => {
+router.post("/addproduct", cheackUser, async (req, res) => {
     const { series_name,
         product_name,
         model_no,

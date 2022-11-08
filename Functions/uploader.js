@@ -2,7 +2,6 @@ var cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv')
 dotenv.config()
 //upload images to cloudinary
-
 const cloudinaryImageUploadMethod = async file => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload(file.tempFilePath, {

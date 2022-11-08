@@ -46,19 +46,13 @@ router.post("/deleteuser", cheackUser, (req, res) => {
     })
 })
 
-//private route
-router.post("/private", cheackUser, (req, res) => {
-
-    res.status(200).json({ message: `helloo ${req.user}` })
-})
-
 //login route 
 router.post("/login", Verify, (req, res) => {
 
     const { email, password } = req.body
     const token = jwt.sign({ email, password },
         process.env.secure_key,
-        { expiresIn: "1h" }
+        { expiresIn: "2h" }
     )
     res.json({ token: token })
 })

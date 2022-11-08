@@ -5,5 +5,4 @@ let formSheama = new mongoose.Schema({
     message: String
 
 })
-
 module.exports = mongoose.model("formdetails", formSheama)

@@ -10,5 +10,4 @@ let categoryScheama = new mongoose.Schema({
     }]
 
 })
-
 module.exports = mongoose.model("category", categoryScheama)

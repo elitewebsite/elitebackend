@@ -7,7 +7,6 @@ let productScheama = new mongoose.Schema({
     model_no: String,
     product_description: String,
     images: Array,
-
     //navpills section 
     info: Object,
     pdflink: String,

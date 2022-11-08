@@ -65,37 +65,37 @@ router.get("/getdynamic", (req, res) => {
 })
 
 
-router.get("/addhomedynamic", (req, res) => {
-    const info = {
-        carousel: [{
-            "title": "",
-            "url": ""
-        },
-        {
-            "title": "",
-            "url": ""
-        }],
+// router.get("/addhomedynamic", (req, res) => {
+//     const info = {
+//         carousel: [{
+//             "title": "",
+//             "url": ""
+//         },
+//         {
+//             "title": "",
+//             "url": ""
+//         }],
 
-        about: [
-            {
-                img: "",
-                title: "",
-                content: ""
+//         about: [
+//             {
+//                 img: "",
+//                 title: "",
+//                 content: ""
 
-            },
-            {
-                img: "",
-                title: "",
-                content: ""
-            }
-        ]
-    }
-    const homedynamic = new Homedynamic({ carousel: info.carousel, about: info.about });
-    homedynamic.save().then(() => {
-        res.status(200).send("status is ok")
-    }).catch((err) => {
-        res.status(400).send("error in addtion")
-    })
+//             },
+//             {
+//                 img: "",
+//                 title: "",
+//                 content: ""
+//             }
+//         ]
+//     }
+//     const homedynamic = new Homedynamic({ carousel: info.carousel, about: info.about });
+//     homedynamic.save().then(() => {
+//         res.status(200).send("status is ok")
+//     }).catch((err) => {
+//         res.status(400).send("error in addtion")
+//     })
 
-})
+// })
 module.exports = router;

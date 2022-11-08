@@ -25,6 +25,5 @@ app.use('/auth', auth)
 app.use('/admincrud', admincrud)
 app.use('/homedynamic', homedynamic)
 app.use('/getfomdata', userforms)
-
 //app listening
 app.listen(port)

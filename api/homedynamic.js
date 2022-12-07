@@ -11,47 +11,62 @@ cloudinary.config({
     secure: true
 });
 //update the hom epage content
-router.post("/updatehomepage", cheackUser, async (req, res) => {
+router.post("/updatehomepage", async (req, res) => {
     //create aboject to store  in database
-    file1 = await cloudinary.uploader.upload(req.body.file1)
-    file2 = await cloudinary.uploader.upload(req.body.file2)
     file3 = await cloudinary.uploader.upload(req.body.file3)
     file4 = await cloudinary.uploader.upload(req.body.file4)
+    const { info } = req.body
+    const parsedInfo = JSON.parse(info)
 
-    try {
-        const info = {
-            carousel: [{
-                "title": req.body.carousel1title,
-                "url": file1.url
+    let finalimages = parsedInfo.map(async (val) => {
+        const myvalue = await cloudinary.uploader.upload(val)
+        return { title: val.title, image: { url: myvalue.url, public_id: myvalue.public_id } }
+    })
+
+    //actually returning the bulk images
+    let imageResponses = await Promise.all(finalimages);
+
+    // console.log(JSON.parse(info))
+    // res.send("ok")
+    // try {
+    //     const info = {
+    //         carousel: [{
+    //             "title": req.body.carousel1title,
+    //             "url": file1.url
+    //         },
+    //         {
+    //             "title": req.body.carousel2title,
+    //             "url": file2.url
+    //         }],
+
+    const about = [
+        {
+            img: {
+                url: file3.url,
+                public_id: file3.public_id
             },
-            {
-                "title": req.body.carousel2title,
-                "url": file2.url
-            }],
-
-            about: [
-                {
-                    img: file3.url,
-                    title: req.body.about1title,
-                    content: req.body.about1desc
-
-                },
-                {
-                    img: file4.url,
-                    title: req.body.about2title,
-                    content: req.body.about2desc
-                }
-            ]
+            title: req.body.about1title,
+            content: req.body.about1desc
+        },
+        {
+            img: {
+                url: file3.url,
+                public_id: file3.public_id
+            },
+            title: req.body.about2title,
+            content: req.body.about2desc
         }
-        Homedynamic.findByIdAndUpdate("636a3d719f2b55693070f6ec", { carousel: info.carousel, about: info.about }).then(async (respo) => {
-            res.status(200).send("doc updated succesfully..")
-        }).catch((err) => {
-            res.status(400).send(err)
-        })
-    }
-    catch (e) {
-        res.status(400).send(err)
-    }
+    ]
+    //     }
+    //     Homedynamic.findByIdAndUpdate("636a3d719f2b55693070f6ec", { carousel: info.carousel, about: info.about }).then(async (respo) => {
+    //         res.status(200).send("doc updated succesfully..")
+    //     }).catch((err) => {
+    //         res.status(400).send(err)
+    //     })
+    // }
+    // catch (e) {
+    //     res.status(400).send(err)
+    // }
 
 })
 
@@ -65,37 +80,37 @@ router.get("/getdynamic", (req, res) => {
 })
 
 
-// router.get("/addhomedynamic", (req, res) => {
-//     const info = {
-//         carousel: [{
-//             "title": "",
-//             "url": ""
-//         },
-//         {
-//             "title": "",
-//             "url": ""
-//         }],
+router.get("/addhomedynamic", (req, res) => {
+    const info = {
+        carousel: [{
+            "title": "",
+            "url": ""
+        },
+        {
+            "title": "",
+            "url": ""
+        }],
 
-//         about: [
-//             {
-//                 img: "",
-//                 title: "",
-//                 content: ""
+        about: [
+            {
+                img: "",
+                title: "",
+                content: ""
 
-//             },
-//             {
-//                 img: "",
-//                 title: "",
-//                 content: ""
-//             }
-//         ]
-//     }
-//     const homedynamic = new Homedynamic({ carousel: info.carousel, about: info.about });
-//     homedynamic.save().then(() => {
-//         res.status(200).send("status is ok")
-//     }).catch((err) => {
-//         res.status(400).send("error in addtion")
-//     })
+            },
+            {
+                img: "",
+                title: "",
+                content: ""
+            }
+        ]
+    }
+    const homedynamic = new Homedynamic({ carousel: info.carousel, about: info.about });
+    homedynamic.save().then(() => {
+        res.status(200).send("status is ok")
+    }).catch((err) => {
+        res.status(400).send("error in addtion")
+    })
 
-// })
+})
 module.exports = router;

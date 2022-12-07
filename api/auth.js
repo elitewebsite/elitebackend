@@ -1,12 +1,13 @@
 const express = require("express")
 const router = express.Router();
 const jwt = require("jsonwebtoken")
-const cheackUser = require("../Middlewears/cheackUser")
 const User = require("../Models/User")
 const Verify = require("../Middlewears/verifyUser")
+const Cheackrootuser = require("../Middlewears/rootUser")
 require('dotenv').config()
+
 //private route user should be logged in to create user
-router.post("/newuser", cheackUser, async (req, res) => {
+router.post("/newuser", Cheackrootuser, async (req, res) => {
     const { email, password } = req.body;
     const user = await User.find({ email })
 
@@ -24,8 +25,8 @@ router.post("/newuser", cheackUser, async (req, res) => {
     }
 })
 
-// Get all users
-router.get("/getalluser", cheackUser, (req, res) => {
+// Get all users private
+router.get("/getalluser", Cheackrootuser, (req, res) => {
     User.find().then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
@@ -33,8 +34,8 @@ router.get("/getalluser", cheackUser, (req, res) => {
     })
 })
 
-//delte user
-router.post("/deleteuser", cheackUser, (req, res) => {
+//delte user private
+router.post("/deleteuser", Cheackrootuser, (req, res) => {
     const { id } = req.body;
     User.findByIdAndDelete(id, (err, doc) => {
         if (err) {
@@ -46,13 +47,12 @@ router.post("/deleteuser", cheackUser, (req, res) => {
     })
 })
 
-//login route 
+//login route  verify 
 router.post("/login", Verify, (req, res) => {
-
-    const { email, password } = req.body
+const { email, password } = req.body
     const token = jwt.sign({ email, password },
         process.env.secure_key,
-        { expiresIn: "2h" }
+        { expiresIn: "3h" }
     )
     res.json({ token: token })
 })

@@ -1,13 +1,13 @@
 const mongoose = require("mongoose")
 const express = require("express")
 const router = express.Router();
-
+const fs = require('fs')
 //product scheamas
 const Category = require("../Models/Series")
 const Product = require("../Models/Product")
 const Light = require("../Models/Light")
+const User = require("../Models/User")
 require('dotenv').config();
-
 //middlewear to cheack user logged in or not
 const cheackUser = require("../Middlewears/cheackUser")
 
@@ -29,6 +29,7 @@ mongoose.connect(connection).then((res) => {
     console.log(err)
 })
 
+fs.readFile
 
 // ************************* Main Light Category Section ***********************
 //create main light category
@@ -87,7 +88,6 @@ router.post("/getlightcategoryid", cheackUser, (req, res) => {
     })
 })
 
-
 //delete main light category
 router.post('/deletemainlight', cheackUser, (req, res) => {
     const { id } = req.body
@@ -138,8 +138,8 @@ router.post("/getseriesbyid", cheackUser, (req, res) => {
     })
 })
 
-//Read  all series with all data
-router.get("/getallseries", cheackUser, (req, res) => {
+//Read  all series with all data default public for main website
+router.get("/getallseries", (req, res) => {
     Category.find().then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
@@ -147,16 +147,17 @@ router.get("/getallseries", cheackUser, (req, res) => {
     })
 })
 
-//Get all series names only
+
+//Get all series names only 
 router.get("/getseriesname", cheackUser, (req, res) => {
-    Category.find({}, { series: 1, _id: 0 }).then((val) => {
+    Category.find({}, { series: 1, _id: 1 }).then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
         res.status(400).send("Error document not found")
     })
 })
 
-//update series name, image url and main light category name
+//Update: series name, image url and main light category name
 router.post("/updateseries", cheackUser, async (req, res) => {
     const { id, series, mainlight, myfile } = req.body
     try {
@@ -174,6 +175,23 @@ router.post("/updateseries", cheackUser, async (req, res) => {
         res.status(400).send(e)
     }
 })
+
+//chanage the order of a series
+router.post("/changeseriesorder", cheackUser, (req, res) => {
+    const { series_id, order } = req.body
+    Category.updateOne({ _id: series_id }, {
+        $set: {
+            sequence_no: order
+        }
+    }).then((result) => {
+        res.status(200).send(result)
+    }).catch((err) => {
+        res.send("error found")
+    })
+    // res.status(200).send("order " )
+
+})
+
 
 //Delete delete a perticular series
 router.post("/deleteseries", cheackUser, (req, res) => {
@@ -201,7 +219,7 @@ router.post("/deleteseries", cheackUser, (req, res) => {
 // ********************** Product Section *************************
 
 //Create:add new product to series with all related details
-router.post("/addproduct", cheackUser, async (req, res) => {
+router.post("/addproduct", async (req, res) => {
     const { series_name,
         product_name,
         model_no,
@@ -209,37 +227,69 @@ router.post("/addproduct", cheackUser, async (req, res) => {
         info,
         news,
         youtube,
-        file1,
-        file2,
-        file3,
-        file4,
+        images,
         pdffile } = req.body
-    const infofinal = JSON.parse(info)
-    try {
-        const pdflink = await cloudinary.uploader.upload(pdffile)
-        const img1 = await cloudinary.uploader.upload(file1)
-        const img2 = await cloudinary.uploader.upload(file2)
-        const img3 = await cloudinary.uploader.upload(file3)
-        const img4 = await cloudinary.uploader.upload(file4)
-        const images = [
-            img1.url,
-            img2.url,
-            img3.url,
-            img4.url
-        ]
 
+    //const reader=new FileReader()
+    try {
+
+        //const pdfsarr = JSON.parse(pdffile)
+        const infofinal = JSON.parse(info)
+        const newyoutube = JSON.parse(youtube)
+        //images.split(",")
+        //const imagesarr = images
+        // let myfinal = []
+        // const mystream = fs.createReadStream(images)
+        // mystream.on("data", (hcunkdata) => {
+        //     myfinal = JSON.parse(hcunkdata)
+        // })
+
+        // mystream.on("end", () => {
+        //     res.status(200).send("ok")
+        // })
+        // JSON.parse(images, (val) => {
+
+        // })
+        //  res.status(200).send("ok")
+        //logic for getting images in bulk
+        //************************************************ */
+        const imagesarr = JSON.parse(images)
+        //console.log(imagesarr)
+        let finalimages = imagesarr.map(async (val) => {
+            const myvalue = await cloudinary.uploader.upload(val)
+            return { url: myvalue.url, public_id: myvalue.public_id }
+        })
+
+
+        // actually returning the bulk images
+        let imageResponses = await Promise.all(finalimages);
+        // ************************************************/
+
+        //  logic for getting pdfs in bulk
+        // ***************************************************/
+        const pdfsarr = JSON.parse(pdffile)
+
+        let finalpdfs = pdfsarr.map(async (val) => {
+            const myvalue = await cloudinary.uploader.upload(val)
+            return { url: myvalue.url, public_id: myvalue.public_id }
+
+        })
+        // actually returnign the bulk pdfs
+        let pdfResponses = await Promise.all(finalpdfs);
+
+        // ************************************************/
         const product = new Product({
-            //main product details
+            // main product details
             series_name,
             product_name,
             model_no,
             product_description,
-            images,
-            //navpills section 
+            images: imageResponses,
+            // navpills section 
             info: infofinal,
-            pdflink: pdflink.url,
+            pdflink: pdfResponses,
             news,
-            youtube,
+            youtube: newyoutube,
         })
         product.save().then((val) => {
             Category.updateOne({ series: series_name }, { $addToSet: { products: val._id } }, async (err, docs) => {
@@ -257,6 +307,7 @@ router.post("/addproduct", cheackUser, async (req, res) => {
         })
     }
     catch (e) {
+        console.log(e)
         res.status(400).send(e)
     }
 })
@@ -273,42 +324,68 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
         info,
         news,
         youtube,
-        file1,
-        file2,
-        file3,
-        file4,
+        images,
         pdffile
     } = req.body
+    const newyoutube = JSON.parse(youtube)
+
+    //  images != [] ? "" : ""
     try {
-        const pdflink = await cloudinary.uploader.upload(pdffile)
-        const img1 = await cloudinary.uploader.upload(file1)
-        const img2 = await cloudinary.uploader.upload(file2)
-        const img3 = await cloudinary.uploader.upload(file3)
-        const img4 = await cloudinary.uploader.upload(file4)
-        const images = [
-            img1.url,
-            img2.url,
-            img3.url,
-            img4.url
-        ]
+        //logic for getting images in bulk
+        //************************************************ */
+        const imagesarr = JSON.parse(images)
+        let finalimages = imagesarr.map(async (val) => {
+            const myvalue = await cloudinary.uploader.upload(val)
+            return { url: myvalue.url, public_id: myvalue.public_id }
+        })
+
+        //actually returning the bulk images
+        let imageResponses = await Promise.all(finalimages);
+        //************************************************/
+
+        //logic for getting pdfs in bulk
+        //***************************************************/
+        const pdfsarr = JSON.parse(pdffile)
+        let finalpdfs = pdfsarr.map(async (val) => {
+            const myvalue = await cloudinary.uploader.upload(val)
+            return { url: myvalue.url, public_id: myvalue.public_id }
+
+        })
+        //actually returnign the bulk pdfs
+        let pdfResponses = await Promise.all(finalpdfs);
+
+        //************************************************/
         const infofinal = JSON.parse(info)
         Product.findByIdAndUpdate(id, {
             series_name,
             product_name,
             model_no,
             product_description,
-            images,
+            images: imageResponses,
             //navpills section 
             info: infofinal,
-            pdflink: pdflink.url,
+            pdflink: pdfResponses,
             news,
-            youtube
+            youtube: newyoutube
         },
             async function (err, docs) {
                 if (err) {
                     res.status(400).send("Something went wrong..")
                 }
                 else {
+
+                    //*******************************************/
+                    //delete all images  from cloudinary
+                    const resuls = docs.images.map(async (val, idx) => {
+                        await cloudinary.uploader.destroy(val.public_id)
+                    })
+                    await Promise.all(resuls);
+                    // delete all pdf files from cloudinary
+                    const resuls1 = docs.pdflink.map(async (val, idx) => {
+                        await cloudinary.uploader.destroy(val.public_id)
+                    })
+                    await Promise.all(resuls1);
+                    //*******************************/
                     res.status(200).send("Doc updated successfully...")
                 }
             });
@@ -322,16 +399,28 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
 //Delete:code to delet a perticular product from database
 router.post('/deleteproduct', cheackUser, (req, res) => {
     const { id, series } = req.body;
-    Product.findByIdAndDelete(id, function (err, docs) {
+    Product.findByIdAndDelete(id, function (err, docsmain) {
         if (err) {
-            res.status(400).send("Something went wrong..")
+            res.status(400).send("Something went wrong.....")
         }
         else {
-            Category.updateOne({ series }, { $pull: { products: { $eq: id } } }, (err, docs) => {
+            Category.updateOne({ series }, { $pull: { products: { $eq: id } } }, async (err, docs) => {
                 if (err) {
                     res.status(400).send("Error Occured")
                 }
                 else {
+                    //*******************************************/
+                    //delete all images  from cloudinary
+                    const resuls = docsmain.images.map(async (val, idx) => {
+                        await cloudinary.uploader.destroy(val.public_id)
+                    })
+                    await Promise.all(resuls);
+                    // delete all pdf files from cloudinary
+                    const resuls1 = docsmain.pdflink.map(async (val, idx) => {
+                        await cloudinary.uploader.destroy(val.public_id)
+                    })
+                    await Promise.all(resuls1);
+                    //*******************************/
                     res.status(200).send("Document deleted successfully..")
                 }
             })
@@ -353,7 +442,18 @@ router.post('/getproductbyid', cheackUser, (req, res) => {
 
 //Read :get product details for product table
 router.get("/getallproducts", cheackUser, (req, res) => {
-    Product.find({}, { pdflink: 0, news: 0, youtube: 0, product_description: 0 }).sort([["series", 1]]).then((data) => {
+    const series_name = req.query.series
+
+    Product.find({ series_name }, { pdflink: 0, news: 0, youtube: 0, product_description: 0 }).sort([["series", -1]]).then((data) => {
+        res.status(200).send(data)
+    }).catch((err) => {
+        res.status(400).send('Something went wrong')
+    })
+})
+//get only product names for changing indexing of the user
+router.post("/getallproductsfororder", cheackUser, (req, res) => {
+    const { series_name } = req.body
+    Product.find({ series_name }, { product_name: 1, _id: 1 }).then((data) => {
         res.status(200).send(data)
     }).catch((err) => {
         res.status(400).send('Something went wrong')
@@ -375,6 +475,35 @@ router.get("/getall", (req, res) => {
 
 })
 
+router.get("/getanalyticsdata", cheackUser, async (req, res) => {
+    const result1 = await Category.count()
+    const result2 = await Light.count()
+    const result3 = await Product.count()
+    const result4 = await User.count()
+    const final = {
+        series: result1,
+        mainlight: result2,
+        product: result3,
+        users: result4
+    }
+    res.status(200).send(final)
+})
+
+
+router.post("/changeproductorder", cheackUser, (req, res) => {
+    const { product_id, order } = req.body
+    Product.updateOne({ _id: product_id }, {
+        $set: {
+            sequence_no: order
+        }
+    }).then((result) => {
+        res.status(200).send(result)
+    }).catch((err) => {
+        res.send("error found")
+    })
+    // res.status(200).send("order " )
+
+})
 // ************************ Peoducts Section End ***********************
 
 module.exports = router

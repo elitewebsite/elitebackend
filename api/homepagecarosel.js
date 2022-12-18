@@ -36,27 +36,18 @@ cloudinary.config({
 //update carosel images 
 router.post("/updatecarouseldetails", cheackUser, async (req, res) => {
     const { info } = req.body
-
     //parse the data
     const parsedInfo = JSON.parse(info)
-
-    //upload images to cloudinary
-    let finalimages = parsedInfo.map(async (val) => {
-        const myvalue = await cloudinary.uploader.upload(val.image)
-        return { title: val.title, image: { url: myvalue.url, public_id: myvalue.public_id } }
-    })
-    const imagetosave = await Promise.all(finalimages)
     //update carousel document
     HomeCarsosel.findByIdAndUpdate("638d7d7b81120cc057b532e6", {
-        info: imagetosave
+        info: parsedInfo
     }, async (err, val) => {
         if (err) {
             res.status(400).send("sorry carousel not updated")
         }
         else {
-
             const myrespo = val.info.map(async (respo1, idx1) => {
-                await cloudinary.uploader.destroy(respo1.image.public_id)
+                await cloudinary.uploader.destroy(respo1.public_id)
             })
             await Promise.all(myrespo)
             res.status(200).send('doc updated successffully..')

@@ -1,3 +1,4 @@
+// Schema for dynamic home and about page (old code)
 const mongoose = require("mongoose")
 
 let Homedynamic = new mongoose.Schema({

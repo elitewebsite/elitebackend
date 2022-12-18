@@ -1,3 +1,4 @@
+// Schema for OTP
 const mongoose = require("mongoose")
 let otpScheama = new mongoose.Schema({
     name: {

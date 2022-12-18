@@ -2,7 +2,7 @@ const express = require("express")
 const myForm = require('../Models/UserformModel')
 const router = express.Router();
 const cheackUser = require("../Middlewears/cheackUser")
-
+//Getting details from contact form
 router.post('/getformdetails', (req, res) => {
     const { name, email, message, contact } = req.body;
     const Details = new myForm({
@@ -17,7 +17,6 @@ router.post('/getformdetails', (req, res) => {
         res.status(400).send("error in contact form")
     })
 })
-
 
 //get all queries
 router.get('/showformdetails', cheackUser, (req, res) => {

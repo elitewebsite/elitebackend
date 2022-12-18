@@ -1,3 +1,4 @@
+// Very created user
 const User = require("../Models/User")
 
 function verifyUser(req, res, next) {

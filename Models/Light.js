@@ -1,3 +1,4 @@
+// Schema for mainlight category
 const mongoose = require("mongoose")
 let light = new mongoose.Schema({
     name: String,

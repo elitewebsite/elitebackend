@@ -4,21 +4,19 @@ const mongoose = require("mongoose")
 let productScheama = new mongoose.Schema({
     sequence_no: {
         type: Number,
-        default: 10
+        default: 12
     },
     series_name: String,
     product_name: String,
     model_no: String,
     product_description: String,
     images: Array,
+
     //navpills section 
     info: Object,
     pdflink: Array,
-    news: String,
+    news: Array,
     youtube: Array
 })
-
-module.exports = mongoose.model("product", productScheama)
-
 
 module.exports = mongoose.model("product", productScheama)

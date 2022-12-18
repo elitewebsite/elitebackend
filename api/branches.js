@@ -69,4 +69,27 @@ router.post('/getbranchdetails', cheackUser, (req, res) => {
 
 })
 
+//Read : get all branch name for sequence change
+router.get('/getbranchesnames', (req, res) => {
+    Branches.find({}, { branch_name: 1 }).then((val) => {
+        res.status(200).send(val)
+    }).catch((err) => {
+        res.status(400).send(err)
+    })
+})
+
+//change sequence of branch
+router.post('/changebranchsequence', cheackUser, (req, res) => {
+    const { branch_id, branch_order } = req.body
+    Branches.updateOne({ _id: branch_id }, {
+        $set: {
+            sequence_no: branch_order
+        }
+    }).then((result) => {
+        res.status(200).send("okk")
+    }).catch((err) => {
+        res.send("error found")
+    })
+})
+
 module.exports = router;

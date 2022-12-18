@@ -1,5 +1,5 @@
-const mongoose = require("mongoose")
 //scheama for series
+const mongoose = require("mongoose")
 let categoryScheama = new mongoose.Schema({
     sequence_no: {
         type: Number,

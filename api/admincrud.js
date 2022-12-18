@@ -134,13 +134,15 @@ router.post("/getseriesbyid", cheackUser, (req, res) => {
     Category.findById(id, { products: 0 }).then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
-        res.status(400).send("Error in fetching..")
+        res.status(400).send("Error in fetching...")
     })
 })
 
-//Read  all series with all data default public for main website
+//Read all series with all data default public for main website
 router.get("/getallseries", (req, res) => {
-    Category.find().then((val) => {
+    const { main_light } = req.query
+    
+    Category.find({ mainlight:main_light }).then((val) => {
         res.status(200).send(val)
     }).catch((err) => {
         res.status(400).send("error document not found")
@@ -230,53 +232,12 @@ router.post("/addproduct", async (req, res) => {
         images,
         pdffile } = req.body
 
-    //const reader=new FileReader()
     try {
-
-        //const pdfsarr = JSON.parse(pdffile)
         const infofinal = JSON.parse(info)
         const newyoutube = JSON.parse(youtube)
-        //images.split(",")
-        //const imagesarr = images
-        // let myfinal = []
-        // const mystream = fs.createReadStream(images)
-        // mystream.on("data", (hcunkdata) => {
-        //     myfinal = JSON.parse(hcunkdata)
-        // })
-
-        // mystream.on("end", () => {
-        //     res.status(200).send("ok")
-        // })
-        // JSON.parse(images, (val) => {
-
-        // })
-        //  res.status(200).send("ok")
-        //logic for getting images in bulk
-        //************************************************ */
         const imagesarr = JSON.parse(images)
-        //console.log(imagesarr)
-        let finalimages = imagesarr.map(async (val) => {
-            const myvalue = await cloudinary.uploader.upload(val)
-            return { url: myvalue.url, public_id: myvalue.public_id }
-        })
-
-
-        // actually returning the bulk images
-        let imageResponses = await Promise.all(finalimages);
-        // ************************************************/
-
-        //  logic for getting pdfs in bulk
-        // ***************************************************/
         const pdfsarr = JSON.parse(pdffile)
-
-        let finalpdfs = pdfsarr.map(async (val) => {
-            const myvalue = await cloudinary.uploader.upload(val)
-            return { url: myvalue.url, public_id: myvalue.public_id }
-
-        })
-        // actually returnign the bulk pdfs
-        let pdfResponses = await Promise.all(finalpdfs);
-
+        const newsarr = JSON.parse(news)
         // ************************************************/
         const product = new Product({
             // main product details
@@ -284,11 +245,11 @@ router.post("/addproduct", async (req, res) => {
             product_name,
             model_no,
             product_description,
-            images: imageResponses,
+            images: imagesarr,
             // navpills section 
             info: infofinal,
-            pdflink: pdfResponses,
-            news,
+            pdflink: pdfsarr,
+            news: newsarr,
             youtube: newyoutube,
         })
         product.save().then((val) => {
@@ -327,45 +288,26 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
         images,
         pdffile
     } = req.body
+
+    const infofinal = JSON.parse(info)
     const newyoutube = JSON.parse(youtube)
+    const imagesarr = JSON.parse(images)
+    const pdfsarr = JSON.parse(pdffile)
+    const newsarr = JSON.parse(news)
+    //************************************************/
 
-    //  images != [] ? "" : ""
     try {
-        //logic for getting images in bulk
-        //************************************************ */
-        const imagesarr = JSON.parse(images)
-        let finalimages = imagesarr.map(async (val) => {
-            const myvalue = await cloudinary.uploader.upload(val)
-            return { url: myvalue.url, public_id: myvalue.public_id }
-        })
-
-        //actually returning the bulk images
-        let imageResponses = await Promise.all(finalimages);
-        //************************************************/
-
-        //logic for getting pdfs in bulk
-        //***************************************************/
-        const pdfsarr = JSON.parse(pdffile)
-        let finalpdfs = pdfsarr.map(async (val) => {
-            const myvalue = await cloudinary.uploader.upload(val)
-            return { url: myvalue.url, public_id: myvalue.public_id }
-
-        })
-        //actually returnign the bulk pdfs
-        let pdfResponses = await Promise.all(finalpdfs);
-
-        //************************************************/
-        const infofinal = JSON.parse(info)
         Product.findByIdAndUpdate(id, {
             series_name,
             product_name,
             model_no,
             product_description,
-            images: imageResponses,
+            images: imagesarr,
+
             //navpills section 
             info: infofinal,
-            pdflink: pdfResponses,
-            news,
+            pdflink: pdfsarr,
+            news: newsarr,
             youtube: newyoutube
         },
             async function (err, docs) {
@@ -373,7 +315,6 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
                     res.status(400).send("Something went wrong..")
                 }
                 else {
-
                     //*******************************************/
                     //delete all images  from cloudinary
                     const resuls = docs.images.map(async (val, idx) => {
@@ -382,7 +323,10 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
                     await Promise.all(resuls);
                     // delete all pdf files from cloudinary
                     const resuls1 = docs.pdflink.map(async (val, idx) => {
-                        await cloudinary.uploader.destroy(val.public_id)
+                        await cloudinary.uploader.destroy(val.public_id, {
+                            resource_type: "raw",
+                            invalidate: true,
+                        })
                     })
                     await Promise.all(resuls1);
                     //*******************************/
@@ -394,7 +338,6 @@ router.post('/updateproduct', cheackUser, async (req, res) => {
         res.status(400).send(e)
     }
 })
-
 
 //Delete:code to delet a perticular product from database
 router.post('/deleteproduct', cheackUser, (req, res) => {
@@ -417,7 +360,10 @@ router.post('/deleteproduct', cheackUser, (req, res) => {
                     await Promise.all(resuls);
                     // delete all pdf files from cloudinary
                     const resuls1 = docsmain.pdflink.map(async (val, idx) => {
-                        await cloudinary.uploader.destroy(val.public_id)
+                        await cloudinary.uploader.destroy(val.public_id, {
+                            resource_type: "raw",
+                            invalidate: true,
+                        })
                     })
                     await Promise.all(resuls1);
                     //*******************************/
@@ -504,6 +450,7 @@ router.post("/changeproductorder", cheackUser, (req, res) => {
     // res.status(200).send("order " )
 
 })
+
 // ************************ Peoducts Section End ***********************
 
 module.exports = router

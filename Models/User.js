@@ -1,3 +1,4 @@
+// Schema for user
 const mongoose = require("mongoose")
 let userSheama = new mongoose.Schema({
     email: String,

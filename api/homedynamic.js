@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router();
 const Homedynamic = require("../Models/Homedynamic")
 const cheackUser = require("../Middlewears/cheackUser")
+
 //delete the temporary folder which stores the images buffer
 var cloudinary = require('cloudinary').v2;
 cloudinary.config({
@@ -26,19 +27,6 @@ router.post("/updatehomepage", async (req, res) => {
     //actually returning the bulk images
     let imageResponses = await Promise.all(finalimages);
 
-    // console.log(JSON.parse(info))
-    // res.send("ok")
-    // try {
-    //     const info = {
-    //         carousel: [{
-    //             "title": req.body.carousel1title,
-    //             "url": file1.url
-    //         },
-    //         {
-    //             "title": req.body.carousel2title,
-    //             "url": file2.url
-    //         }],
-
     const about = [
         {
             img: {
@@ -57,17 +45,7 @@ router.post("/updatehomepage", async (req, res) => {
             content: req.body.about2desc
         }
     ]
-    //     }
-    //     Homedynamic.findByIdAndUpdate("636a3d719f2b55693070f6ec", { carousel: info.carousel, about: info.about }).then(async (respo) => {
-    //         res.status(200).send("doc updated succesfully..")
-    //     }).catch((err) => {
-    //         res.status(400).send(err)
-    //     })
-    // }
-    // catch (e) {
-    //     res.status(400).send(err)
-    // }
-
+ 
 })
 
 // View Home page publically on website

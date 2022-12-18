@@ -1,3 +1,4 @@
+// Schema for gallery images
 const mongoose = require("mongoose")
 const gallerySceame = new mongoose.Schema({
     eventName: String,

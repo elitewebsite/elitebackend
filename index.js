@@ -27,6 +27,12 @@ const fileupload = require("express-fileupload")
 app.use(fileupload({
     useTempFiles: false,
 }))
+app.get('/',(req,res)=>{
+    res.json({
+        title:"Elite Website Backend Version 2",
+        description:"Congratulations..! Your backend is ready to use.."
+    })
+})
 app.use('/auth', auth)
 app.use('/admincrud', admincrud)
 app.use('/homedynamic', homedynamic)
